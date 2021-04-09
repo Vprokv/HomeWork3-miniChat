@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css">
+    <title>Чат</title>
+</head>
+<body>
+
+<div
+        class="d-flex
+        flex-column
+        flex-md-row
+        align-items-center
+        p-3 px-md-4
+        mb-3
+        bg-white b
+        order-bottom
+        shadow-sm">
+    <div class="container">
+        <div class="py-5 text-center">
+            <h2>
+                MiniChat
+            </h2>
+            <p class="lead">
+                Укажите ваше имя и начинайте переписку
+            </p>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <h3>
+                    Форма отправки сообщений
+                </h3>
+
+                <form id="messForm">
+                    <label for="name">
+                        Имя
+                    </label>
+                    <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            placeholder="Введите имя"
+                            class="form-control"
+                            required>
+                    <br>
+                    <label for="message">
+                        Сообщение
+                    </label>
+                    <textarea
+                            name="message"
+                            id="message"
+                            class="form-control"
+                            placeholder="Введите сообщение">
+
+                    </textarea>
+                    <br>
+                    <input
+                            type="submit"
+                            value="Отправить"
+                            class="btn btn-danger"
+
+
+                    >
+
+                </form>
+
+            </div>
+            <div class="col-6">
+                <h3>
+                    Сообщения
+                </h3>
+                <div id="all_mess"></div>
+            </div>
+        </div>
+        <script
+                src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script
+                src="/socket.io/socket.io.js"></script>
+        <script>
+            $(function () {
+                const socket=io.connect();
+                const $form = $("#messForm");
+                const $name= $("#name");
+                const $textarea = $("#message");
+                const $all_messages = $("#all_mess");
+                const random = Math.floor(Math.random() * (5));
+                const alertClasses = ['secondary', 'danger', 'success', 'warning', 'info', 'light'];
+                const alertClass = alertClasses[random];
+
+
+                $form.submit(function (event) {
+                    event.preventDefault();
+                    socket.emit('send mess', {
+                        mess: $textarea.val(),
+                        name: $name.val(),
+                        className:alertClass
+                    });
+                    $textarea.val('');
+
+                });
+
+
+                socket.on('add mess', (data) => {
+                    $all_messages.append(
+                        "<div " +
+                        "class='alert alert-" +
+                        data.className + "'>" +
+                        "<b>" +
+                        data.name +
+                        "</b>: "
+                        + data.mess +
+                        "</div>");
+                });
+                // socket.on('number sockets', (numClients) => {
+                //
+                // });
+
+            })
+
+        </script>
+    </div>
+</body>
+</html>
